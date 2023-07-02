@@ -14,15 +14,15 @@ isLess ('Проверяемая строка', 10);*/
 //  имяФункции('Кекс');  // false
 //  Это палиндром
 // имяФункции('Лёша на полке клопа нашёл '); // true
-let isPalindrom = (string) => {
-  let toString = string
+const isPalindrom = (string) => {
+  const textString = string
     .toLowerCase()
     .replaceAll(' ', '');
   let reverseString = '';
-  for (let i = toString.length - 1; i >= 0; i--) {
-    reverseString += toString.at(i);
-  } // я не почему мы вводим - 1.
-  return toString === reverseString;
+  for (let i = textString.length - 1; i >= 0; i--) {
+    reverseString += textString.at(i);
+  }
+  return textString === reverseString;
 };
 
 isPalindrom ('Лёша на полке клопа нашёл ');
@@ -73,16 +73,20 @@ const myPadStart = (string, minLength, pad) => {
     result = actualPad + result;
   }
   return result;
-}
+};
 
 myPadStart ('q', 4, 'we');
 
 // Функция, возвращающая случайное число с плавающей точкой
 
 function getRandomPositiveInteger (a, b) {
-  if (a < 0 || b < 0) return NaN;
+  if (a < 0 || b < 0) {
+    return NaN;
+  }
   // В случае отрицательных значений аргументов вернет NaN
-  if (b < a) [b, a] = [a, b];
+  if (b < a) {
+    [b, a] = [a, b];
+  }
   // В случае если аргумент "от" больше "до" значений аргументов поменяются местами
   // После нам нужно убедиться, что пользователь не передал дробные значения,
   // мы округляем к ближайшему большему целому с помощью Math.ceil,
@@ -103,8 +107,12 @@ getRandomPositiveInteger(3, 5);
 
 function getRandomPositiveFloat (a, b, digits = 1) {
   // Если переданы отрицительные числа, возвращаем NaN
-  if (a < 0 || b < 0 || digits < 0) return NaN;
-  if (b < a) [b, a] = [a, b];
+  if (a < 0 || b < 0 || digits < 0) {
+    return NaN;
+  }
+  if (b < a) {
+    [b, a] = [a, b];
+  }
   // Дальше используем Math.random() для получения случайного дробного числа в диапазоне [0, 1],
   // которое домножаем на разницу между переданными числами - это будет наша случайная дельта.
   // После нужно сложить дельту с минимальным значением, чтобы получить итоговое случайное число.

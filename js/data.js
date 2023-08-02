@@ -1,4 +1,4 @@
-import {getRandomPositiveInteger, getRandomPositiveFloat, getRandomElement, getRandomArray, getAvatarNumber} from "./utils.js";
+import {getRandomPositiveInteger, getRandomPositiveFloat, getRandomElement, getRandomArray} from './utils.js';
 const OFFERS_COUNT = 10;
 
 const TITLES = [
@@ -54,6 +54,15 @@ const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg',
 ];
 
+// Возвращает строку с неповторяющимся значением
+let number = 0;
+const getAvatarNumber = () => {
+  for (let i = 1; i <= OFFERS_COUNT; i++) {
+    number += 1;
+    return number < 10 ? `img/avatars/user0${number}.png` : `img/avatars/user${number}.png`;
+  }
+};
+
 // Создает одно объявление
 const create = () => {
   const x = getRandomPositiveFloat(35.65000, 35.70000, 5);
@@ -84,4 +93,4 @@ const create = () => {
 
 // Генерирует 10 объявлений
 const generation = new Array(OFFERS_COUNT).fill('').map(() => create());
-export {generation, OFFERS_COUNT};
+export {generation};

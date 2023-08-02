@@ -1,2 +1,1 @@
-import { generation } from "./data.js";
-console.log(generation);
+import { generation } from './data.js';

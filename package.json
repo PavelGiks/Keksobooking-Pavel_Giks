@@ -9,7 +9,7 @@
     "url": "{{sshUrl}}"
   },
   "bugs": {
-    "url": "{{bugsUrl}}"
+    "url": "https://github.com/PavelGiks/Keksobooking-Pavel_Giks"
   },
   "devDependencies": {
     "browser-sync": "2.27.11",

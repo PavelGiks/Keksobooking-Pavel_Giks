@@ -11,7 +11,7 @@ function getRandomPositiveInteger (a, b) {
   const result = Math.random() * (upper - lower + 1) + lower;
   return Math.floor(result);
 }
-  
+
 // Возвращает случайное целое число с плавающей точкой
 function getRandomPositiveFloat (a, b, digits = 1) {
   // Если переданы отрицительные числа, возвращаем NaN

@@ -3,12 +3,13 @@
   "version": "28.0.0",
   "private": true,
   "description": "Личный проект «{{projectTitle}}» от HTML Academy",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "{{sshUrl}}"
   },
   "bugs": {
-    "url": "{{bugsUrl}}"
+    "url": "https://github.com/PavelGiks/Keksobooking-Pavel_Giks"
   },
   "devDependencies": {
     "browser-sync": "2.27.11",

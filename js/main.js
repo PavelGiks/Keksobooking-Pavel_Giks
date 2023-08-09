@@ -1,1 +1,1 @@
-import { generation } from './data.js';
+import './data.js';

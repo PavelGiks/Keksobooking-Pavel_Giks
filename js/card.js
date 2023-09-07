@@ -8,8 +8,8 @@ const TYPES_OF_HOTTELS = {
   hotel: 'Отель',
 };
 
-const cardTemplate = document.querySelector('#card').content;
-const mapCard = cardTemplate.querySelector('.popup');
+const popupTemplate = document.querySelector('#card').content;
+const mapPopup = popupTemplate.querySelector('.popup');
 
 const renderFeatures = (items, container) => {
   if (items) {
@@ -53,7 +53,7 @@ const renderPhotos = (items, container) => {
 };
 
 const renderCard = (element) => {
-  const card = mapCard.cloneNode(true);
+  const card = mapPopup.cloneNode(true);
   card.querySelector('.popup__avatar').src = element.author.avatar;
   card.querySelector('.popup__title').textContent = element.offer.title;
   card.querySelector('.popup__text--address').textContent = element.offer.address;

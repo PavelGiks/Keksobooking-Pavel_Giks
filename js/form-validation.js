@@ -6,6 +6,7 @@ const guests = form.querySelector('#capacity');
 const type = document.querySelector('#type');
 const timeIn = form.querySelector('#timein');
 const timeOut = form.querySelector('#timeout');
+const sliderElement = document.querySelector('.ad-form__slider');
 
 const pristine = new Pristine(form, {
   classTo: 'ad-form__element',
@@ -45,10 +46,10 @@ const getErrorTitleMessage = (value) => {
 };
 pristine.addValidator(title, validateTitle, getErrorTitleMessage);
 // Валидация цены за ночь
-const validatePrice = () => Number(price.value) >= Price.min && Number(price.value) <= Price.max;
+const validatePrice = () => Number(price.value) >= typePrice[type.value] && Number(price.value) <= Price.max;
 const getErrorPriceMessage = () => {
-  if (Number(price.value) <= Price.min) {
-    return `Минимальная цена должна быть больше ${Price.min}`;
+  if (Number(price.value) <= typePrice[type.value]) {
+    return `Минимальная цена для выбранного типа жилья ${typePrice[type.value]}`;
   } else if (Number(price.value) > Price.max) {
     return `Максимальная цена должна быть меньше ${Price.max}`;
   } else {
@@ -56,6 +57,7 @@ const getErrorPriceMessage = () => {
   }
 };
 pristine.addValidator(price, validatePrice, getErrorPriceMessage);
+
 // Валидация количества комнат и количества мест
 const validateRoomsAndGuests = () => (Number(guests.value) <= Number(rooms.value) && Number(rooms.value) !== 100 && Number(guests.value) !== 0) || (Number(rooms.value) === 100 && Number(guests.value) === 0);
 const getErrorRoomsMessage = () => {
@@ -74,13 +76,6 @@ const getErrorGuestsMessage = () => {
 };
 pristine.addValidator(guests, validateRoomsAndGuests, getErrorRoomsMessage);
 pristine.addValidator(rooms, validateRoomsAndGuests, getErrorGuestsMessage);
-
-// Валидация типа жилья
-const validateMinPrice = () => typePrice[type.value] <= price.value;
-
-const getMinPriceErrorMessage = () => `Минимальная цена для выбранного типа жилья ${typePrice[type.value]}`;
-
-pristine.addValidator(price, validateMinPrice, getMinPriceErrorMessage);
 
 type.addEventListener('change', () => {
   price.placeholder = typePrice[type.value];
@@ -101,4 +96,34 @@ form.addEventListener('submit', (evt) => {
   if (pristine.validate()) {
     form.submit();
   }
+});
+
+// слайдер
+noUiSlider.create(sliderElement, {
+  range: {
+    min: Price.min,
+    max: Price.max,
+  },
+  start: Price.min,
+  step: 1,
+  connect: 'lower',
+  format: {
+    to: function (value) {
+      return value.toFixed(0);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  },
+});
+
+sliderElement.noUiSlider.on('update', () => {
+  price.value = sliderElement.noUiSlider.get();
+});
+
+price.addEventListener('change', () => {
+  sliderElement.noUiSlider.updateOptions(
+    {start:price.value},
+    false
+  );
 });

@@ -1,5 +1,3 @@
-import {generation} from './data.js';
-
 const TYPES_OF_HOTTELS = {
   flat: 'Квартира',
   bungalow: 'Бунгало',
@@ -73,9 +71,5 @@ const renderCard = (element) => {
   renderPhotos(element.offer.photos, photoCard);
   return card;
 };
-
-// Отрисовка первого сгенерированного элемента в блок #map-canvas
-const map = document.querySelector('#map-canvas');
-map.appendChild(renderCard(generation[0]));
 
 export { renderCard };

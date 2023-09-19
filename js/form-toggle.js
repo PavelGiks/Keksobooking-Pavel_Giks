@@ -39,4 +39,4 @@ const activatePage = () => {
 
 activatePage ();
 
-export { deactivatePage, activatePage };
+export { adForm, deactivatePage, activatePage };

@@ -22,6 +22,7 @@
     "lint": "eslint js/"
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
     "pristinejs": "^1.1.0"
   }
 }

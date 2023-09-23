@@ -1,107 +1,104 @@
-import {activatePage, adForm} from './form-toggle.js';
-import {renderCard} from './card.js';
+import { switchStatePage } from './page.js';
+import { createCardTemplate } from './card.js';
+import { MAX_COUNT_OFFER } from './consts.js';
 
-const COORDINATE_ROUNDING = 5;
-const ZOOM_MAP = 10;
-
-const CENTER = {
-  lat: 35.70000,
-  lng: 139.75000,
+export const MainPinCoordinates = {
+  LAT: 35.68399,
+  LNG: 139.75378,
+  SCALE: 12,
+  DIGITS: 5,
 };
 
-// Главная метка
-const PIN_MAIN = L.icon({
-  iconUrl: 'img/main-pin.svg',
-  iconSize: [52, 52],
-  iconAnchor: [26, 52],
-});
+const map = L.map('map-canvas');
 
-// Метка для объявлений
-const PIN_ADD = L.icon({
-  iconUrl: 'img/pin.svg',
+const pinIcon = L.icon({
+  iconUrl: '/img/pin.svg',
   iconSize: [40, 40],
   iconAnchor: [20, 40],
 });
 
-// Open source изображение
-const LeafletParameters = {
-  TILE_LAYER: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-};
+const mainPinIcon = L.icon({
+  iconUrl: '/img/main-pin.svg',
+  iconSize: [52, 52],
+  iconAnchor: [26, 52],
+});
 
-// Создание изначальных координат в поле "Адрес (координаты)"
-const addressForm = adForm.querySelector('#address');
-const updateAddress = (location) => {
-  const lat = location.lat.toFixed(COORDINATE_ROUNDING);
-  const lng = location.lng.toFixed(COORDINATE_ROUNDING);
-  addressForm.value = `${lat} ${lng}`;
-};
-
-// Отображение карты
-const map = L.map('map-canvas')
-  .on('load', () => {
-    updateAddress(CENTER);
-    activatePage();
-  }).setView(CENTER, ZOOM_MAP);
-
-// добавление open source изображения на созданную карту
-L.tileLayer(
-  LeafletParameters.TILE_LAYER,
+const mainPinMarker = L.marker(
   {
-    attribution: LeafletParameters.ATTRIBUTION,
+    lat: MainPinCoordinates.LAT,
+    lng: MainPinCoordinates.LNG,
   },
-).addTo(map);
-
-// Добавление метки
-const mainPin = L.marker(
-  CENTER,
   {
     draggable: true,
-    icon: PIN_MAIN,
+    icon: mainPinIcon,
   },
 );
 
-mainPin.addTo(map);
-
-// Обработчик передвижения метки по карте
-mainPin.on('move', (evt) => {
-  updateAddress(evt.target.getLatLng());
-});
-
-const notice = document.querySelector('.notice');
-const noticeForm = notice.querySelector('.ad-form');
-const resetButton = noticeForm.querySelector('button[type="reset"]');
-
-// Возвращение метки на исходные координаты
-const resetMainPin = (marker) => {
-  marker.setLatLng(CENTER);
-  map.setView(CENTER, ZOOM_MAP);
+const setMainPin = () => {
+  mainPinMarker.addTo(map);
+  mainPinMarker.addTo(map).on('move', (evt) => {
+    document.querySelector('.ad-form').querySelector('#address').value = `${evt.target.getLatLng().lat.toFixed(MainPinCoordinates.DIGITS)} ${evt.target.getLatLng().lng.toFixed(MainPinCoordinates.DIGITS)}`;
+  });
 };
 
-const getResetForm = () => {
-  resetMainPin(mainPin);
+const markerGroup = L.layerGroup();
+
+const createNearbyMarker = ({author, offer, location}) => {
+  const nearbyMarker = L.marker(
+    {
+      lat: location.lat,
+      lng: location.lng,
+    },
+    {
+      icon: pinIcon,
+    },
+  );
+  nearbyMarker.addTo(markerGroup).bindPopup(createCardTemplate(author, offer));
 };
 
-resetButton.addEventListener('click', getResetForm);
+const clearMap = () => markerGroup.clearLayers();
 
-// Создание метки с объявлением
-const createPinAd = (ad, layer = map) => {
-  const marker = L.marker(ad.location, {icon: PIN_ADD});
-  marker
-    .addTo(layer)
-    .bindPopup(renderCard(ad),
-      {
-        keepInView: true,
-      },
-    );
-  return marker;
+export const renderPointsToMap = (points) => {
+  points.slice(0, MAX_COUNT_OFFER).forEach((point) => createNearbyMarker(point));
 };
 
-// Создание слоя с группой меток
-const createMarkerGroup = (ads) => {
-  const markerGroup = L.layerGroup().addTo(map);
-  ads.forEach((ad) => createPinAd(ad, markerGroup));
-  return markerGroup;
+const setDefaultAddressInput = () => {
+  document.querySelector('.ad-form').querySelector('#address').value = `${MainPinCoordinates.LAT}, ${MainPinCoordinates.LNG}`;
 };
 
-export {resetMainPin, createPinAd, createMarkerGroup};
+const loadMap = (points) => {
+  map
+    .on('load', () => {
+      switchStatePage(true);
+      renderPointsToMap(points);
+    })
+    .setView({
+      lat: MainPinCoordinates.LAT,
+      lng: MainPinCoordinates.LNG,
+    }, MainPinCoordinates.SCALE);
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    },
+  ).addTo(map);
+  setMainPin(map);
+  setDefaultAddressInput();
+  markerGroup.addTo(map);
+};
+
+const resetMap = () => {
+  map.setView({
+    lat: MainPinCoordinates.LAT,
+    lng: MainPinCoordinates.LNG,
+  }, MainPinCoordinates.SCALE);
+  mainPinMarker.setLatLng({
+    lat: MainPinCoordinates.LAT,
+    lng: MainPinCoordinates.LNG,
+  });
+  setDefaultAddressInput();
+  map.closePopup();
+};
+
+export { loadMap, createNearbyMarker, resetMap, clearMap, mainPinMarker };

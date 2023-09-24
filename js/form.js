@@ -3,7 +3,7 @@ import { form, pristine } from './validation.js';
 import { resetMap } from './map.js';
 import { getPreviewImg, resetPreviewImg} from './picture-load.js';
 import { openPopup } from './popup.js';
-import { ErrorPopupMessage } from './consts.js';
+import { ErrorPopup } from './consts.js';
 import { slider } from './validation.js';
 import { resetFilter } from './filter.js';
 
@@ -37,7 +37,7 @@ const onFormSubmit = (evt) => {
       openPopup();
       resetForm();
       resetFilter();
-    }, () => openPopup(ErrorPopupMessage.ERROR_POST), new FormData(evt.target));
+    }, () => openPopup(ErrorPopup.ERROR_POST), new FormData(evt.target));
   }
 };
 

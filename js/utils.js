@@ -1,4 +1,3 @@
-import { DEBOUNCE_DELAY } from './consts.js';
 
 const declineNum = (n, titles) => {
   let index = 0;
@@ -15,13 +14,4 @@ const declineNum = (n, titles) => {
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
-const debounce = (callback, timeoutDelay = DEBOUNCE_DELAY) => {
-  let timeoutId;
-
-  return (...rest) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
-  };
-};
-
-export { declineNum, isEscapeKey, debounce };
+export { declineNum, isEscapeKey };

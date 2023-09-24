@@ -1,6 +1,13 @@
 import { switchStatePage } from './page.js';
 import { createCardTemplate } from './card.js';
 import { MAX_COUNT_OFFER } from './consts.js';
+import { getData } from './api.js';
+import { initSlider } from './validation.js';
+import { initForm } from './form.js';
+import { closePopup, openPopup } from './popup.js';
+import { TIMEOUT_GET_DATA_ERROR_POPUP_SHOW } from './consts.js';
+import { startFilter } from './filter.js';
+
 
 export const MainPinCoordinates = {
   LAT: 35.68399,
@@ -37,7 +44,7 @@ const mainPinMarker = L.marker(
 const setMainPin = () => {
   mainPinMarker.addTo(map);
   mainPinMarker.addTo(map).on('move', (evt) => {
-    document.querySelector('.ad-form').querySelector('#address').value = `${evt.target.getLatLng().lat.toFixed(MainPinCoordinates.DIGITS)} ${evt.target.getLatLng().lng.toFixed(MainPinCoordinates.DIGITS)}`;
+    document.querySelector('.ad-form').querySelector('#address').value = `${evt.target.getLatLng().lat.toFixed(MainPinCoordinates.DIGITS)} , ${evt.target.getLatLng().lng.toFixed(MainPinCoordinates.DIGITS)}`;
   });
 };
 
@@ -66,11 +73,24 @@ const setDefaultAddressInput = () => {
   document.querySelector('.ad-form').querySelector('#address').value = `${MainPinCoordinates.LAT}, ${MainPinCoordinates.LNG}`;
 };
 
-const loadMap = (points) => {
+const successGetDataHandler = (data) => {
+  const points = data.slice();
+  initForm();
+  startFilter(points);
+  initSlider();
+  renderPointsToMap(points);
+};
+
+const errorGetDataHandler = (message) => {
+  openPopup(message, true);
+  setTimeout(() => closePopup(), TIMEOUT_GET_DATA_ERROR_POPUP_SHOW);
+};
+
+const loadMap = () => {
   map
     .on('load', () => {
       switchStatePage(true);
-      renderPointsToMap(points);
+      getData(successGetDataHandler, errorGetDataHandler);
     })
     .setView({
       lat: MainPinCoordinates.LAT,

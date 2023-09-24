@@ -1,14 +1,13 @@
 import { DEBOUNCE_DELAY } from './consts.js';
 import { renderPointsToMap, clearMap } from './map.js';
 
-const FilterTypes = {
-  TYPE: 'type',
-  PRICE: 'price',
-  ROOMS: 'room',
-  GUESTS: 'guest',
-  FEATURES: 'features',
-};
-
+// const FilterTypes = {
+//   TYPE: 'type',
+//   PRICE: 'price',
+//   ROOMS: 'room',
+//   GUESTS: 'guest',
+//   FEATURES: 'features',
+// };
 const PriceValueToTypes = {
   LOW: 10000,
   MIDDLE: {
@@ -17,40 +16,11 @@ const PriceValueToTypes = {
   },
   HIGH: 50000,
 };
-
 const PriceTypes = {
   ANY: 'any',
   LOW: 'low',
   MIDDLE: 'middle',
   HIGH: 'high',
-};
-
-const RoomTypes = {
-  ANY: 'any',
-  ONE: 'one',
-  TWO: 'two',
-  THREE: 'three',
-};
-
-const GuestTypes = {
-  ANY: 'any',
-  ONE: 'one',
-  TWO: 'two',
-  NOT: 'not',
-};
-
-const roomValueToType = {
-  any: 0,
-  one: 1,
-  two: 2,
-  three: 3,
-};
-
-const guestValueToType = {
-  any: 0,
-  one: 1,
-  two: 2,
-  not: 0,
 };
 
 const debounce = (callback, timeoutDelay = DEBOUNCE_DELAY) => {
@@ -72,132 +42,55 @@ const fieldsetFeatures = mapFilter.querySelector('#housing-features');
 
 let defaultPoints = [];
 
-const getFilteredPointsToPrice = (points, price) => {
-  const filteredPoints = points.filter(({offer}) => {
-    let isMatch = true;
-
-    if (price === PriceTypes.LOW) {
-      isMatch = offer.price < PriceValueToTypes.LOW;
-    }
-
-    if (price === PriceTypes.MIDDLE) {
-      isMatch = offer.price <= PriceValueToTypes.MIDDLE.high && offer.price >= PriceValueToTypes.MIDDLE.low ;
-    }
-
-    if (price === PriceTypes.HIGH) {
-      isMatch = offer.price > PriceValueToTypes.HIGH;
-    }
-
-    return isMatch;
-  });
-
-  return filteredPoints;
-};
-
-const getFilteredPointsToRoom = (points, room) => {
-  const filteredPoints = points.filter(({offer}) => {
-    let isMatch = true;
-
-    if (room === RoomTypes.ANY) {
-      isMatch = offer.rooms >= roomValueToType[room];
-    }
-
-    if (room === RoomTypes.ONE) {
-      isMatch = offer.rooms === roomValueToType[room];
-    }
-
-    if (room === RoomTypes.TWO) {
-      isMatch = offer.rooms === roomValueToType[room];
-    }
-
-    if (room === RoomTypes.THREE) {
-      isMatch = offer.rooms === roomValueToType[room];
-    }
-
-    return isMatch;
-  });
-
-  return filteredPoints;
-};
-
-const getFilteredPointsToGuest = (points, guest) => {
-  const filteredPoints = points.filter(({offer}) => {
-    let isMatch = true;
-
-    if (guest === GuestTypes.ANY) {
-      isMatch = offer.guests >= guestValueToType[guest];
-    }
-
-    if (guest === GuestTypes.ONE) {
-      isMatch = offer.guests === guestValueToType[guest];
-    }
-
-    if (guest === GuestTypes.TWO) {
-      isMatch = offer.guests === guestValueToType[guest];
-    }
-
-    if (guest === GuestTypes.NOT) {
-      isMatch = offer.guests === guestValueToType[guest];
-    }
-
-    return isMatch;
-  });
-
-  return filteredPoints;
-};
-
-const getFilteredPointsToType = (points, type) => {
-  if (type === 'any') {
-    return defaultPoints.slice();
+const getFilteredPointsToPrice = (point, price) => {
+  if (price === PriceTypes.LOW) {
+    return point.offer.price < PriceValueToTypes.LOW;
   }
-  const filteredPoints = points.filter(({offer}) => offer.type === type);
-
-  return filteredPoints;
+  if (price === PriceTypes.MIDDLE) {
+    return point.offer.price <= PriceValueToTypes.MIDDLE.high && point.offer.price >= PriceValueToTypes.MIDDLE.low ;
+  }
+  if (price === PriceTypes.HIGH) {
+    return point.offer.price > PriceValueToTypes.HIGH;
+  }
+  return true;
 };
 
+const getFilteredPointsToRoom = (point, room) => {
+  if (room !== 'any') {
+    return point.offer.rooms === Number(room);
+  }
+  return true;
+};
 
-const getFilteredPointsToFeatures = (points, features) => {
-  const filteredPoints = points.filter(({offer}) => {
-    if (!offer.features) {
-      return false;
-    }
+const getFilteredPointsToGuest = (point, guest) => {
+  if (guest !== 'any') {
+    return point.offer.guests === Number(guest);
+  }
+  return true;
+};
 
-    const pointFeatures = offer.features;
+const getFilteredPointsToType = (point, type) => {
+  if (type === 'any') {
+    return true;
+  }
+  return point.offer.type === type;
+};
 
-    const difference = features.filter((feature) => !pointFeatures.includes(feature));
-
-
-    if (difference.length === 0) {
-      return true;
-    }
-
+const getFilteredPointsToFeatures = (point, features) => {
+  if (!point.offer.features) {
     return false;
-  });
-
-  return filteredPoints;
+  }
+  const pointFeatures = point.offer.features;
+  const difference = features.filter((feature) => !pointFeatures.includes(feature));
+  if (difference.length === 0) {
+    return true;
+  }
+  return false;
 };
 
 const getFilteredPointToAllParameters = (filterParameters) => {
-  let filteredPoints = defaultPoints.slice();
-
-  for (const [key, value] of Object.entries(filterParameters)) {
-    if (key === FilterTypes.TYPE) {
-      filteredPoints = getFilteredPointsToType(filteredPoints, value);
-    }
-    if (key === FilterTypes.PRICE) {
-      filteredPoints = getFilteredPointsToPrice(filteredPoints, value);
-    }
-    if (key === FilterTypes.ROOMS) {
-      filteredPoints = getFilteredPointsToRoom(filteredPoints, value);
-    }
-    if (key === FilterTypes.GUESTS) {
-      filteredPoints = getFilteredPointsToGuest(filteredPoints, value);
-    }
-    if (key === FilterTypes.FEATURES) {
-      filteredPoints = getFilteredPointsToFeatures(filteredPoints, value);
-    }
-  }
-
+  const filteredPoints = defaultPoints.filter((point) => getFilteredPointsToFeatures(point, filterParameters.features) && getFilteredPointsToType(point, filterParameters.type)
+  && getFilteredPointsToPrice(point, filterParameters.price) && getFilteredPointsToRoom(point, filterParameters.room) && getFilteredPointsToGuest(point, filterParameters.guest));
   return filteredPoints;
 };
 

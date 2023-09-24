@@ -1,13 +1,6 @@
 import { DEBOUNCE_DELAY } from './consts.js';
 import { renderPointsToMap, clearMap } from './map.js';
 
-// const FilterTypes = {
-//   TYPE: 'type',
-//   PRICE: 'price',
-//   ROOMS: 'room',
-//   GUESTS: 'guest',
-//   FEATURES: 'features',
-// };
 const PriceValueToTypes = {
   LOW: 10000,
   MIDDLE: {
@@ -97,9 +90,7 @@ const getFilteredPointToAllParameters = (filterParameters) => {
 const onMapFilterChange = () => {
   const activeCheckboxElements = fieldsetFeatures.querySelectorAll('input:checked');
   const featuresValues = Array.from(activeCheckboxElements).map((element) => element.value);
-
   clearMap();
-
   const filterParameters = {
     type: selectType.value,
     price: selectPrice.value,

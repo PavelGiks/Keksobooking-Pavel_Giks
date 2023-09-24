@@ -1,75 +1,37 @@
-const TYPES_OF_HOTTELS = {
+import {declineNum} from './utils.js';
+const typePopup = {
   flat: 'Квартира',
   bungalow: 'Бунгало',
   house: 'Дом',
   palace: 'Дворец',
   hotel: 'Отель',
 };
+const createFeaturesTemplate = (features) => `<ul class="popup__features">
+  ${features.map((feature) => `<li class="popup__feature popup__feature--${feature}"></li>`).join('')}
+</ul>`;
 
-const popupTemplate = document.querySelector('#card').content;
-const mapPopup = popupTemplate.querySelector('.popup');
-
-const renderFeatures = (items, container) => {
-  if (items) {
-    container.innerHTML = '';
-    const fragment = document.createDocumentFragment();
-
-    items.forEach((item) => {
-      const element = document.createElement('li');
-      element.classList.add('popup__feature');
-      element.classList.add(`popup__feature--${item}`);
-      fragment.appendChild(element);
-    });
-
-    container.appendChild(fragment);
-
-  } else {
-    container.classList.add('.visually-hidden');
+const getPhotosTemplate = (photos) => {
+  if (!photos) {
+    return '';
   }
+  return `<div class="popup__photos">
+  ${photos.map((photo) => `<img src="${photo}" class="popup__photo" width="45" height="40" alt="Фотография жилья">`).join('')}
+</div>`;
 };
 
-const renderPhotos = (items, container) => {
-  if (items) {
-    container.innerHTML = '';
-    const fragment = document.createDocumentFragment();
-
-    items.map((item) => {
-      const element = document.createElement('img');
-      element.classList.add('popup__photo');
-      element.src = item;
-      element.width = 70;
-      element.height = 60;
-      element.alt = 'Фотография номера';
-      fragment.appendChild(element);
-    });
-
-    container.appendChild(fragment);
-
-  } else {
-    container.classList.add('.visually-hidden');
-  }
+export const createCardTemplate = (author, offer) => {
+  const declinedRooms = declineNum(offer.rooms, ['комната', 'комнаты', 'комнат']);
+  const declinedGuests = declineNum(offer.guests, ['гостя', 'гостей', 'гостей']);
+  return `<article class="popup">
+      <img src="${author.avatar}" class="popup__avatar" width="70" height="70" alt="Аватар пользователя">
+      <h3 class="popup__title">${offer.title}</h3>
+      <p class="popup__text popup__text--address">${offer.address}</p>
+      <p class="popup__text popup__text--price">${offer.price} <span>₽/ночь</span></p>
+      <h4 class="popup__type">${typePopup[offer.type]}</h4>
+      <p class="popup__text popup__text--capacity">${offer.rooms} ${declinedRooms} для ${offer.guests} ${declinedGuests}</p>
+      <p class="popup__text popup__text--time">Заезд после ${offer.checkin}, выезд до ${offer.checkout}</p>
+      ${offer.features ? createFeaturesTemplate(offer.features) : ''}
+      ${offer.description ? ` <p class="popup__description">${offer.description}</p>` : ''}
+      ${getPhotosTemplate(offer.photos)}
+  </article>`;
 };
-
-const renderCard = (element) => {
-  const card = mapPopup.cloneNode(true);
-  card.querySelector('.popup__avatar').src = element.author.avatar;
-  card.querySelector('.popup__title').textContent = element.offer.title;
-  card.querySelector('.popup__text--address').textContent = element.offer.address;
-  card.querySelector('.popup__text--price').textContent = `${element.offer.price} ₽/ночь`;
-  card.querySelector('.popup__type').textContent = TYPES_OF_HOTTELS[element.offer.type];
-  card.querySelector('.popup__text--capacity').textContent = `${element.offer.rooms} комнаты для ${element.offer.guests} гостей`;
-  card.querySelector('.popup__text--time').textContent = `Заезд после ${element.offer.checkin}, выезд до ${element.offer.checkout}`;
-
-  const featureCard = card.querySelector('.popup__features');
-  renderFeatures(element.offer.features, featureCard);
-  const descriptionCard = card.querySelector('.popup__description');
-  descriptionCard.textContent = element.offer.description;
-  if (element.offer.description.length === 0) {
-    descriptionCard.classList.add('.visually-hidden');
-  }
-  const photoCard = card.querySelector('.popup__photos');
-  renderPhotos(element.offer.photos, photoCard);
-  return card;
-};
-
-export { renderCard };
